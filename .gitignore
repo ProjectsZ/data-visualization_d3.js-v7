@@ -1,0 +1,25 @@
+
+# dependencies
+/node_modules
+
+# production
+
+# development
+/dist
+
+# IDE - VSCode
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.history/*
+
+# misc
+.DS_Store
+process.env
+npm-debug.log
+
+# System Files
+.DS_Store
+Thumbs.db
