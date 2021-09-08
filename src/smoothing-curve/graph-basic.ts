@@ -3,7 +3,7 @@ import * as d3 from "d3";
 
 export class GraphBasic {
     
-    margin = {top: 30, right: 20, bottom: 30, left: 50};
+    margin = {top: 30, right: 50, bottom: 30, left: 30};
     width: number = window.innerWidth * 0.9;
     height: number = 270;
 
@@ -21,8 +21,8 @@ export class GraphBasic {
         var parseDate = d3.timeParse("%d-%b-%y"); // ("%Y-%m-%d")
 
         // Set the ranges
-        var x = d3.scaleTime()
-                .range([0, setWidth]);
+        let x = d3.scaleTime()
+                .range([1, setWidth]);
         var y = d3.scaleLinear()
                 .range([setHeight, 0]);
 
@@ -31,9 +31,13 @@ export class GraphBasic {
         var yAxis = d3.axisLeft(y).ticks(5);
 
         // Define the line
-        var valueline = d3.line()
+        let valueLine1 = d3.line()
                         .x((d: any)=> { return x(d.date); })
                         .y((d: any)=> { return y(d.close); });
+        
+        let valueLine2 = d3.line()
+                        .x((d: any)=> { return x(d.date); })
+                        .y((d: any)=> { return y(d.open); });
 
         // Define the area
         var area = d3.area()
@@ -60,16 +64,18 @@ export class GraphBasic {
             data.forEach((d: any)=> {
                 d.date = parseDate(d.date);
                 d.close = +d.close;
+                d.open = +d.open;
             });
             
             // Scale the range of the data
             x.domain(<[Date, Date]>d3.extent(data, (d) =>  d.date ));  //  TypeScript is unable to rule out that the first overload matches. add [Date, Date] 
-            y.domain([0, d3.max(data, (d)=> d.close )]);
+            y.domain([0,
+                <number>d3.max(data, (d)=> Math.max(d.close, d.open) )]);
             
             // Add the valueline path.
             svg.append("path")
-                .attr("class", "line")
-                .attr("d", valueline(data));
+                .attr("class", "line").style("stroke-dasharray", ("5, 3")) // <== ("stroke-dasharray", sizeStroke, spaceBetweenStroke)
+                .attr("d", valueLine1(data));
             
             // Add the X Axis
             svg.append("g")
@@ -100,6 +106,26 @@ export class GraphBasic {
                 .call( this.makeYaxis(y, 5)
                         .tickSize(-setWidth)
                         .tickFormat((d)=> ""))
+
+            svg.append("path") // Add the valueline2 path.
+               .style("stroke", "#F44336")
+               .attr("d", valueLine2(data));
+
+            svg.append("text")
+               .attr("transform", 
+                     "translate("+(setWidth-1)+","+y(data[0].close)+")")
+               .attr("dy", ".15em")
+               .attr("text-anchor", "start")
+               .style("fill", "#42A5F5") // @blue_400
+               .text("Close");
+
+            svg.append("text")
+               .attr("transform", 
+                     "translate("+(setWidth-1)+","+y(data[0].open)+")")
+               .attr("dy", ".25em")
+               .attr("text-anchor", "start")
+               .style("fill", "#F44336") // @red_500
+               .text("Open");
         });
         
     }
@@ -111,7 +137,5 @@ export class GraphBasic {
     makeYaxis(y: any, countTicks: number) {
         return d3.axisLeft(y).ticks(countTicks);
     }
-        
-        
 
 }
