@@ -19,3 +19,13 @@ path {
 .grid path {
     stroke-width: 0;
 }
+
+.y.axis path, .y.axis line,
+.y.axis text{
+    stroke: #1E88E5; /* @blue_600  */
+}
+.y1.axis path, .y1.axis line,
+.y1.axis text{
+    stroke: #E53935; /* @red_600  */
+}
+ 

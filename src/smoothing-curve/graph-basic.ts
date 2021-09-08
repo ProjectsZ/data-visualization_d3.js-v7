@@ -25,19 +25,21 @@ export class GraphBasic {
                 .range([1, setWidth]);
         var y = d3.scaleLinear()
                 .range([setHeight, 0]);
+        var y1 = d3.scaleLinear()
+                .range([setHeight, 0]);
 
         // Define the axes
         var xAxis = d3.axisBottom(x).ticks(5); // .tickFormat(function(d:any){ return d.x;});
-        var yAxis = d3.axisLeft(y).ticks(5);
-
+        var yAxisLeft = d3.axisLeft(y).ticks(5);
+        var yAxisRight = d3.axisRight(y1).ticks(5);
         // Define the line
         let valueLine1 = d3.line()
                         .x((d: any)=> { return x(d.date); })
-                        .y((d: any)=> { return y(d.close); });
+                        .y((d: any)=> { return y(d.close); }); // <== y
         
         let valueLine2 = d3.line()
                         .x((d: any)=> { return x(d.date); })
-                        .y((d: any)=> { return y(d.open); });
+                        .y((d: any)=> { return y1(d.open); }); // <== y1
 
         // Define the area
         var area = d3.area()
@@ -70,8 +72,10 @@ export class GraphBasic {
             // Scale the range of the data
             x.domain(<[Date, Date]>d3.extent(data, (d) =>  d.date ));  //  TypeScript is unable to rule out that the first overload matches. add [Date, Date] 
             y.domain([0,
-                <number>d3.max(data, (d)=> Math.max(d.close, d.open) )]);
-            
+                    <number>d3.max(data, (d)=> Math.max(d.close) )]);
+            y1.domain([0,
+                    <number>d3.max(data, (d)=> Math.max(d.open) )]);
+
             // Add the valueline path.
             svg.append("path")
                 .attr("class", "line").style("stroke-dasharray", ("5, 3")) // <== ("stroke-dasharray", sizeStroke, spaceBetweenStroke)
@@ -84,8 +88,12 @@ export class GraphBasic {
                 .call(xAxis);
             // Add the Y Axis
             svg.append("g")
-                .attr("class", "y axis")
-                .call(yAxis);
+                .attr("class", "y axis")     
+                .call(yAxisLeft);
+            svg.append("g")
+                .attr("class", "y1 axis")
+                .attr("transform", `translate(${ setWidth } ,0)`)
+                .call(yAxisRight);
             
             // draw the area
             svg.append("path")
@@ -122,7 +130,7 @@ export class GraphBasic {
             svg.append("text")
                .attr("transform", 
                      "translate("+(setWidth-1)+","+y(data[0].open)+")")
-               .attr("dy", ".25em")
+               .attr("dy", "-.25em")
                .attr("text-anchor", "start")
                .style("fill", "#F44336") // @red_500
                .text("Open");
