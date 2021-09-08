@@ -80,15 +80,38 @@ export class GraphBasic {
             svg.append("g")
                 .attr("class", "y axis")
                 .call(yAxis);
-
+            
+            // draw the area
             svg.append("path")
                 .datum(data) 
                 .attr("class", "area")
                 .attr("style", "fill:#E1F5FE; stroke:none")
                 .attr("d", area);
-                
+            
+            svg.append("g")
+                .attr("class", "grid")
+                .attr("transform", `translate(0, ${ setHeight } )`)
+                .call( this.makeXaxis(x, 5)
+                        .tickSize(-setHeight)
+                        .tickFormat((d)=> "") )
+            
+            svg.append("g")
+                .attr("class", "grid")
+                .call( this.makeYaxis(y, 5)
+                        .tickSize(-setWidth)
+                        .tickFormat((d)=> ""))
         });
         
     }
+
+    makeXaxis(x: any, countTicks: number) {
+       return d3.axisBottom(x).ticks(countTicks);
+    }
+
+    makeYaxis(y: any, countTicks: number) {
+        return d3.axisLeft(y).ticks(countTicks);
+    }
+        
+        
 
 }
