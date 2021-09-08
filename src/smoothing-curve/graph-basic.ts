@@ -35,6 +35,12 @@ export class GraphBasic {
                         .x((d: any)=> { return x(d.date); })
                         .y((d: any)=> { return y(d.close); });
 
+        // Define the area
+        var area = d3.area()
+                    .x((d: any)=> x(d.date))
+                    .y0(setHeight) // (0)
+                    .y1((d: any)=>y(d.close));
+
         // Adds the svg canvas
         var svg = 
          d3.select("#smothing-curve")
@@ -74,9 +80,15 @@ export class GraphBasic {
             svg.append("g")
                 .attr("class", "y axis")
                 .call(yAxis);
+
+            svg.append("path")
+                .datum(data) 
+                .attr("class", "area")
+                .attr("style", "fill:#E1F5FE; stroke:none")
+                .attr("d", area);
+                
         });
         
     }
 
 }
- 
